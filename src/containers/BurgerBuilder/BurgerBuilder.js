@@ -31,6 +31,7 @@ class BurgerBuilder extends Component{
     }
 
     componentDidMount() {
+        //console.log(this.props)
         axios.get('/ingredients')
             .then(response => {
                 this.setState({ingredients: response.data})
@@ -93,36 +94,37 @@ class BurgerBuilder extends Component{
 
     purchaseContinueHandler = () =>{
 
-        this.setState({loading: true})
-        const headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            //'Content-Type': 'application/json',
-            //'Content-Type': 'multipart/form-data',
-        }
-        //alert("You continue!!!")
-        const order = {
-            ingredients: this.state.ingredients,
-            price: this.state.totalPrice,
-            cusomer: {
-                name: 'Ilk',
-                address: {
-                    street: 'Teststreet',
-                    zipCode: '123456',
-                    country: 'Burgistan',
-                },
-                email: 'test@test.com',
-            },
-            deliveryMethod: 'Fast',
-        }
-        axios.post('/orders', order, {headers: headers})
-            .then(response => {
-                this.setState({loading: false, purchasing: false})
-                console.log("Got responce: " + response)
-            })
-            .catch(error => {
-                console.log("Super error "+ error.response)
-                this.setState({loading: false, purchasing: false})
-            });
+        // this.setState({loading: true})
+        // const headers = {
+        //     'Content-Type': 'application/x-www-form-urlencoded',
+        //     //'Content-Type': 'application/json',
+        //     //'Content-Type': 'multipart/form-data',
+        // }
+        // //alert("You continue!!!")
+        // const order = {
+        //     ingredients: this.state.ingredients,
+        //     price: this.state.totalPrice,
+        //     cusomer: {
+        //         name: 'Ilk',
+        //         address: {
+        //             street: 'Teststreet',
+        //             zipCode: '123456',
+        //             country: 'Burgistan',
+        //         },
+        //         email: 'test@test.com',
+        //     },
+        //     deliveryMethod: 'Fast',
+        // }
+        // axios.post('/orders', order, {headers: headers})
+        //     .then(response => {
+        //         this.setState({loading: false, purchasing: false})
+        //         console.log("Got responce: " + response)
+        //     })
+        //     .catch(error => {
+        //         console.log("Super error "+ error.response)
+        //         this.setState({loading: false, purchasing: false})
+        //     });
+        this.props.history.push('/checkout');
     }
 
     render(){

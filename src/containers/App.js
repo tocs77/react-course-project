@@ -6,13 +6,9 @@ import BurgerBuilder from './BurgerBuilder/BurgerBuilder'
 import Checkout from './CheckOut/CheckOut'
 
 
-
-
 class App extends Component {
 
-
   render() {
-
 
     return (
       <div >
