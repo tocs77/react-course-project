@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"math/rand"
+	"log"
 
 	"github.com/gorilla/mux"
 )
@@ -40,11 +42,13 @@ type Order struct {
 	DeliveryMethod string      `json:"deliveryMethod"`
 }
 
+var Orders = map[string]Order{}
+
 func main() {
 	//fillPosts("posts.json")
 	r := mux.NewRouter()
 	r.HandleFunc("/ingredients", handlerIngredients).Methods("GET")
-	r.HandleFunc("/orders", handlerOrder).Methods("POST", "OPTIONS")
+	r.HandleFunc("/orders", handlerOrder).Methods("POST", "OPTIONS", "GET")
 	r.HandleFunc("/posts/{id}", handlerFullPost).Methods("GET", "DELETE")
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 	//http.HandleFunc("/posts", handlerIngredients)
@@ -82,7 +86,7 @@ func handlerIngredients(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
-	w.Write(js)                     
+	w.Write(js)
 }
 
 func handlerOrder(w http.ResponseWriter, r *http.Request) {
@@ -96,6 +100,22 @@ func handlerOrder(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
+
+	if r.Method == "GET" {
+		js, err := json.Marshal(Orders)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(http.StatusOK)
+		w.Write(js)
+
+		return
+	}
+
 	fmt.Println("Received request post")
 	err := r.ParseForm()
 	if err != nil {
@@ -109,10 +129,16 @@ func handlerOrder(w http.ResponseWriter, r *http.Request) {
 	for key := range r.Form {
 		fmt.Println(key)
 		json.Unmarshal([]byte(key), &data)
+		fmt.Println("+++++++++")
 		fmt.Println(data)
+		Orders[generateID()] = data
 	}
+
+	fmt.Println("Here")
+
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusCreated)
+	return
 }
 func notFound(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Not found!!!")
@@ -141,4 +167,13 @@ func handlerFullPost(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusNotFound)
 
+}
+
+func generateID() string {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return fmt.Sprintf("%x", b)
 }

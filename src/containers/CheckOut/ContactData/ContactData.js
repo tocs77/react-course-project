@@ -27,8 +27,8 @@ class ContactData extends Component {
         //alert("You continue!!!")
         const order = {
             ingredients: this.props.ingredients,
-            price: this.props.totalPrice,
-            cusomer: {
+            price: parseFloat(this.props.price),
+            customer: {
                 name: 'Ilk',
                 address: {
                     street: 'Teststreet',
@@ -39,6 +39,8 @@ class ContactData extends Component {
             },
             deliveryMethod: 'Fast',
         }
+
+        console.log("Send user data:", order)
         axios.post('/orders', order, {headers: headers})
             .then(response => {
                 this.setState({loading: false})
