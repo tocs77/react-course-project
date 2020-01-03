@@ -72,11 +72,14 @@ class ContactData extends Component {
             //'Content-Type': 'multipart/form-data',
         }
         //alert("You continue!!!")
+        const formData = {}
+        for (let formElementIdentifier in this.state.orderForm) {
+            formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value
+        }
         const order = {
             ingredients: this.props.ingredients,
             price: parseFloat(this.props.price),
-            
-            deliveryMethod: 'Fast',
+            orderData: formData,
         }
 
         console.log("Send user data:", order)
@@ -91,6 +94,17 @@ class ContactData extends Component {
             });
     }
 
+    inputChangedHandler = (event, inputIdentifier) => {
+        const updatedOrderForm = {
+            ...this.state.orderForm
+        }
+        const updatedFormElement = {...updatedOrderForm[inputIdentifier]}
+
+        updatedFormElement.value = event.target.value
+        updatedOrderForm[inputIdentifier] = updatedFormElement
+        this.setState({orderForm: updatedOrderForm})
+    }
+
     render() {
 
         let formElementsArray = [];
@@ -102,15 +116,16 @@ class ContactData extends Component {
             })
         }
 
-        let form = (<form>
+        let form = (<form onSubmit={this.orderHandler}>
             {formElementsArray.map(formElement => (
                 <Input
                     key={formElement.id}
                     elementType = {formElement.config.elementType}
                     elementConfig={formElement.config.elementConfig}
-                    value={formElement.config.value}/>
+                    value={formElement.config.value}
+                    changed={(event) => this.inputChangedHandler(event, formElement.id)}/>
             ))}
-            <Button inputtype="input" btnType="Success" clicked={this.orderHandler}>ORDER</Button>
+            <Button inputtype="input" btnType="Success">ORDER</Button>
              </form>);
         if(this.state.loading) {
             form = <Spinner />;
