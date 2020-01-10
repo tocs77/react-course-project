@@ -10,7 +10,7 @@ import Spinner from '../../components/UI/Spinner/Spinner'
 
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 
-import * as actionTypes from '../../store/actions'
+import * as burgerBuilderActions from '../../store/actions/index'
 
 import axios from '../../axios-orders'
 
@@ -20,20 +20,11 @@ class BurgerBuilder extends Component{
 
     state = {
         purchasing: false,
-        loading: false,
-        error: false,
     }
 
     componentWillMount() {
-        //console.log(this.props)
-        // axios.get('/ingredients')
-        //     .then(response => {
-        //         this.setState({ingredients: response.data})
-        //         this.updatePurchaseState(response.data)
-        //     })
-        //     .catch(error => {
-        //         this.setState({error: true})
-        //     })
+        console.log(this.props)
+  
     }
 
     updatePurchaseState = (ingredients) => {
@@ -85,10 +76,6 @@ class BurgerBuilder extends Component{
                             
         }
 
-        if (this.state.loading) {
-            orderSummary = <Spinner />
-        }
-
         let burger = this.state.error ? <p>Ingridients can't be loaded</p>:<Spinner /> 
 
         if (this.props.ings) {
@@ -127,8 +114,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) =>{
     return {
-        onIngredientAdded: (ingName) => dispatch({type: actionTypes.ADD_INGREDIENT, ingredientName: ingName}),
-        onIngredientRemoved: (ingName) => dispatch({type: actionTypes.REMOVE_INGREDIENT, ingredientName: ingName})
+        onIngredientAdded: (ingName) => dispatch(burgerBuilderActions.addIngredient(ingName)),
+        onIngredientRemoved: (ingName) => dispatch(burgerBuilderActions.removeIngredient(ingName))
     }
 }
 
