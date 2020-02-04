@@ -3,7 +3,7 @@ import axios from '../../axios-orders';
 
 export const purchseBurgerSuccess = (id, orderData) => {
   return {
-    type: actionTypes.PURCHASE_BURGER_CUCCESS,
+    type: actionTypes.PURCHASE_BURGER_SUCCESS,
     orderId: id,
     orderData: orderData
   };
@@ -16,8 +16,15 @@ export const purchseBurgerFail = error => {
   };
 };
 
-export const purchaseBurgerStart = orderData => {
+export const purchaseBurgerStart = () => {
+  return {
+    type: actionTypes.PURCHASE_BURGER_START
+  };
+};
+
+export const purchaseBurger = orderData => {
   return dispatch => {
+    dispatch(purchaseBurgerStart());
     const headers = {
       'Content-Type': 'application/x-www-form-urlencoded'
       //'Content-Type': 'application/json',
