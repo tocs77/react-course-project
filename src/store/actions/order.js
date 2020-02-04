@@ -34,10 +34,16 @@ export const purchaseBurger = orderData => {
       .post('/orders', orderData, { headers: headers })
       .then(response => {
         console.log(response.data);
-        dispatch(purchseBurgerSuccess(response.data, orderData));
+        dispatch(purchseBurgerSuccess(response.data.name, orderData));
       })
       .catch(error => {
         dispatch(purchseBurgerFail(error));
       });
+  };
+};
+
+export const purchaseInit = () => {
+  return {
+    type: actionTypes.PURCHASE_INIT
   };
 };
