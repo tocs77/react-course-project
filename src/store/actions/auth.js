@@ -21,7 +21,7 @@ export const authFail = error => {
   };
 };
 
-export const auth = (email, password) => {
+export const auth = (email, password, isSignup) => {
   return dispatch => {
     dispatch(authStart());
     const authData = {
@@ -34,8 +34,12 @@ export const auth = (email, password) => {
       //'Content-Type': 'application/json'
       //'Content-Type': 'multipart/form-data',
     };
+    let url = '/signupuser'
+    if (!isSignup) {
+      url = '/signinuser'
+    }
     axios
-      .post('/signupuser', authData, { headers: headers })
+      .post(url, authData, { headers: headers })
       .then(response => {
         console.log(response);
         dispatch(authSuccess(response.data));

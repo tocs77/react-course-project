@@ -186,6 +186,10 @@ func handlerFullPost(w http.ResponseWriter, r *http.Request) {
 func handlerAuth(w http.ResponseWriter, r *http.Request) {
 	id := generateID()
 	if r.Method == "POST" {
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		err := r.ParseForm()
 		if err != nil {
 			fmt.Println("Error parsing form ", err)
@@ -198,14 +202,19 @@ func handlerAuth(w http.ResponseWriter, r *http.Request) {
 			json.Unmarshal([]byte(key), &data)
 			fmt.Println("+++++++++")
 			fmt.Println(data)
-			Users[id] = data
 		}
+		for key := range Users {
+			if Users[key].Email == data.Email {
+				js, _ := json.Marshal(map[string]string{"Message": "User exists"})
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write(js)
+				return
+			}
+		}
+		Users[id] = data
 	}
 
 	js, _ := json.Marshal(map[string]string{"Id": id})
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Write(js)
 	w.WriteHeader(http.StatusOK)
 }
