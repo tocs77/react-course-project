@@ -1,3 +1,4 @@
+import axios from '../../axios-orders';
 import * as actionTypes from './actionTypes';
 
 export const authStart = () => {
@@ -20,10 +21,28 @@ export const authFail = error => {
   };
 };
 
-export const auth = (email, password) =>{
-    return dispatch => {
-        dispatch(authStart())
-    }
-}
-
-
+export const auth = (email, password) => {
+  return dispatch => {
+    dispatch(authStart());
+    const authData = {
+      email: email,
+      password: password,
+      returnSecureToken: true
+    };
+    const headers = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+      //'Content-Type': 'application/json'
+      //'Content-Type': 'multipart/form-data',
+    };
+    axios
+      .post('/signupuser', authData, { headers: headers })
+      .then(response => {
+        console.log(response);
+        dispatch(authSuccess(response.data));
+      })
+      .catch(err => {
+        console.log(err);
+        dispatch(authFail(err));
+      });
+  };
+};

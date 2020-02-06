@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"time"
-	"math/rand"
-	"log"
 
 	"github.com/gorilla/mux"
 )
@@ -35,6 +35,13 @@ type Customer struct {
 	Email   string  `json:"email"`
 }
 
+//UserAuthData authentication data
+type UserAuthData struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+//Order structure
 type Order struct {
 	Ingredients    Ingredients `json:"ingredients"`
 	Price          float64     `json:"price"`
@@ -42,16 +49,22 @@ type Order struct {
 	DeliveryMethod string      `json:"deliveryMethod"`
 }
 
+//Orders to keep orders
 var Orders = map[string]Order{}
+
+//Users Data
+var Users = map[string]UserAuthData{}
 
 func main() {
 	//fillPosts("posts.json")
 	r := mux.NewRouter()
 	r.HandleFunc("/ingredients", handlerIngredients).Methods("GET")
 	r.HandleFunc("/orders", handlerOrder).Methods("POST", "OPTIONS", "GET")
+	r.HandleFunc("/signupuser", handlerAuth).Methods("POST", "OPTIONS", "GET")
 	r.HandleFunc("/posts/{id}", handlerFullPost).Methods("GET", "DELETE")
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 	//http.HandleFunc("/posts", handlerIngredients)
+	fmt.Print("Started")
 	http.ListenAndServe(":3030", r)
 }
 
@@ -157,6 +170,7 @@ func handlerFullPost(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+
 			w.Header().Set("Content-Type", "application/json")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.WriteHeader(http.StatusOK)
@@ -167,6 +181,33 @@ func handlerFullPost(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusNotFound)
 
+}
+
+func handlerAuth(w http.ResponseWriter, r *http.Request) {
+	id := generateID()
+	if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			fmt.Println("Error parsing form ", err)
+		}
+
+		data := UserAuthData{}
+
+		for key := range r.Form {
+			fmt.Println(key)
+			json.Unmarshal([]byte(key), &data)
+			fmt.Println("+++++++++")
+			fmt.Println(data)
+			Users[id] = data
+		}
+	}
+
+	js, _ := json.Marshal(map[string]string{"Id": id})
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Write(js)
+	w.WriteHeader(http.StatusOK)
 }
 
 func generateID() string {
