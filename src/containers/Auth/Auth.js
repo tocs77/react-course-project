@@ -97,6 +97,7 @@ class Auth extends Component {
       return { isSignup: !prevState.isSignup };
     });
   };
+  
   render() {
     let formElementsArray = [];
 

@@ -60,7 +60,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/ingredients", handlerIngredients).Methods("GET")
 	r.HandleFunc("/orders", handlerOrder).Methods("POST", "OPTIONS", "GET")
-	r.HandleFunc("/signupuser", handlerAuth).Methods("POST", "OPTIONS", "GET")
+	r.HandleFunc("/signupuser", handlerSignup).Methods("POST")
+	r.HandleFunc("/signinuser", handlerSignin).Methods("POST")
 	r.HandleFunc("/posts/{id}", handlerFullPost).Methods("GET", "DELETE")
 	r.NotFoundHandler = http.HandlerFunc(notFound)
 	//http.HandleFunc("/posts", handlerIngredients)
@@ -183,40 +184,67 @@ func handlerFullPost(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func handlerAuth(w http.ResponseWriter, r *http.Request) {
+func handlerSignup(w http.ResponseWriter, r *http.Request) {
 	id := generateID()
-	if r.Method == "POST" {
 
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		err := r.ParseForm()
-		if err != nil {
-			fmt.Println("Error parsing form ", err)
-		}
-
-		data := UserAuthData{}
-
-		for key := range r.Form {
-			fmt.Println(key)
-			json.Unmarshal([]byte(key), &data)
-			fmt.Println("+++++++++")
-			fmt.Println(data)
-		}
-		for key := range Users {
-			if Users[key].Email == data.Email {
-				js, _ := json.Marshal(map[string]string{"Message": "User exists"})
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write(js)
-				return
-			}
-		}
-		Users[id] = data
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	err := r.ParseForm()
+	if err != nil {
+		fmt.Println("Error parsing form ", err)
 	}
+
+	data := UserAuthData{}
+
+	for key := range r.Form {
+		fmt.Println(key)
+		json.Unmarshal([]byte(key), &data)
+		fmt.Println(data)
+	}
+	for key := range Users {
+		if Users[key].Email == data.Email {
+			js, _ := json.Marshal(map[string]string{"Message": "User exists"})
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(js)
+			return
+		}
+	}
+	Users[id] = data
 
 	js, _ := json.Marshal(map[string]string{"Id": id})
 	w.Write(js)
 	w.WriteHeader(http.StatusOK)
+}
+
+func handlerSignin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	err := r.ParseForm()
+	if err != nil {
+		fmt.Println("Error parsing form ", err)
+	}
+
+	data := UserAuthData{}
+
+	for key := range r.Form {
+		fmt.Println(key)
+		json.Unmarshal([]byte(key), &data)
+		fmt.Println(data)
+	}
+	for key := range Users {
+		if Users[key].Email == data.Email {
+			if Users[key].Password == data.Password {
+				js, _ := json.Marshal(map[string]string{"IdToken": generateID()})
+				w.WriteHeader(http.StatusOK)
+				w.Write(js)
+				return
+			}
+
+		}
+	}
+	w.WriteHeader(http.StatusBadRequest)
 }
 
 func generateID() string {
