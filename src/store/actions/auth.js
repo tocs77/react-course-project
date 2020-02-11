@@ -7,10 +7,11 @@ export const authStart = () => {
   };
 };
 
-export const authSuccess = authData => {
+export const authSuccess = (token, userId) => {
   return {
     type: actionTypes.AUTH_SUCCESS,
-    authData: authData
+    idToken: token,
+    userId: userId
   };
 };
 
@@ -34,15 +35,15 @@ export const auth = (email, password, isSignup) => {
       //'Content-Type': 'application/json'
       //'Content-Type': 'multipart/form-data',
     };
-    let url = '/signupuser'
+    let url = '/signupuser';
     if (!isSignup) {
-      url = '/signinuser'
+      url = '/signinuser';
     }
     axios
       .post(url, authData, { headers: headers })
       .then(response => {
         console.log(response);
-        dispatch(authSuccess(response.data));
+        dispatch(authSuccess(response.data.idToken, response.data.localId));
       })
       .catch(err => {
         console.log(err);

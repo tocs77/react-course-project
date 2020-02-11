@@ -49,11 +49,19 @@ type Order struct {
 	DeliveryMethod string      `json:"deliveryMethod"`
 }
 
+type AuthResponse struct {
+	LocalID string `json:"localId"`
+	IdToken string `json:"idToken"`
+}
+
 //Orders to keep orders
 var Orders = map[string]Order{}
 
 //Users Data
 var Users = map[string]UserAuthData{}
+
+//Tokens keep authorisation tokens
+var Tokens map[string]string
 
 func main() {
 	//fillPosts("posts.json")
@@ -117,6 +125,7 @@ func handlerOrder(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
 		js, err := json.Marshal(Orders)
+		//err := json.NewEncoder(w).Encode(Orders)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -214,7 +223,7 @@ func handlerSignup(w http.ResponseWriter, r *http.Request) {
 
 	js, _ := json.Marshal(map[string]string{"Id": id})
 	w.Write(js)
-	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusOK)
 }
 
 func handlerSignin(w http.ResponseWriter, r *http.Request) {
@@ -229,14 +238,22 @@ func handlerSignin(w http.ResponseWriter, r *http.Request) {
 	data := UserAuthData{}
 
 	for key := range r.Form {
-		fmt.Println(key)
 		json.Unmarshal([]byte(key), &data)
-		fmt.Println(data)
+		//fmt.Println(data)
 	}
 	for key := range Users {
 		if Users[key].Email == data.Email {
 			if Users[key].Password == data.Password {
-				js, _ := json.Marshal(map[string]string{"IdToken": generateID()})
+				token := generateID() + generateID()
+				Tokens[key] = token
+				ar := AuthResponse{key, token}
+
+				js, err := json.Marshal(ar)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				fmt.Println(js)
 				w.WriteHeader(http.StatusOK)
 				w.Write(js)
 				return
