@@ -52,6 +52,7 @@ type Order struct {
 type AuthResponse struct {
 	LocalID string `json:"localId"`
 	IdToken string `json:"idToken"`
+	ExpiresIn string `json:"expiresIn"`
 }
 
 //Orders to keep orders
@@ -61,7 +62,7 @@ var Orders = map[string]Order{}
 var Users = map[string]UserAuthData{}
 
 //Tokens keep authorisation tokens
-var Tokens map[string]string
+var Tokens = map[string]string{}
 
 func main() {
 	//fillPosts("posts.json")
@@ -246,7 +247,7 @@ func handlerSignin(w http.ResponseWriter, r *http.Request) {
 			if Users[key].Password == data.Password {
 				token := generateID() + generateID()
 				Tokens[key] = token
-				ar := AuthResponse{key, token}
+				ar := AuthResponse{key, token, "3600"}
 
 				js, err := json.Marshal(ar)
 				if err != nil {
