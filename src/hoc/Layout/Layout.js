@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+
 import Aux from '../Auxlillary/auxillary';
 import Toolbar from '../../components/Navigation/Toolbar/Toolbar';
 
@@ -24,12 +26,24 @@ class Layot extends Component {
   render() {
     return (
       <Aux>
-        <Toolbar drawerToggleClicked={this.sideDrawerToggleHandler} />
-        <SideDrawer closed={this.sideDrawerClosedHandler} show={this.state.showSideDrower} />
+        <Toolbar
+          isAuth={this.props.isAuthenticated}
+          drawerToggleClicked={this.sideDrawerToggleHandler}
+        />
+        <SideDrawer
+          isAuth={this.props.isAuthenticated}
+          closed={this.sideDrawerClosedHandler}
+          show={this.state.showSideDrower}
+        />
         <main className={classes.Content}>{this.props.children}</main>
       </Aux>
     );
   }
 }
 
-export default Layot;
+const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.auth.token !== null
+  };
+};
+export default connect(mapStateToProps)(Layot);

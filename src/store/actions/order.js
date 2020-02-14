@@ -22,7 +22,7 @@ export const purchaseBurgerStart = () => {
   };
 };
 
-export const purchaseBurger = orderData => {
+export const purchaseBurger = (orderData, token) => {
   return dispatch => {
     dispatch(purchaseBurgerStart());
     const headers = {
@@ -31,7 +31,7 @@ export const purchaseBurger = orderData => {
       //'Content-Type': 'multipart/form-data',
     };
     axios
-      .post('/orders', orderData, { headers: headers })
+      .post('/orders?auth=' + token, orderData, { headers: headers })
       .then(response => {
         console.log(response.data);
         dispatch(purchseBurgerSuccess(response.data.name, orderData));
@@ -57,8 +57,9 @@ export const fetchOrderSuccess = orders => {
 
 export const fetchOrdersFail = error => {
   return {
-    type: actionTypes.FETCH_INGREDIENTS_FAILED,
-    error: error
+    type: actionTypes.FETCH_ORDERS_FAIL,
+    error: error,
+    loading: false
   };
 };
 
@@ -68,11 +69,11 @@ export const fetchOrdersStart = () => {
   };
 };
 
-export const fetchOrders = () => {
+export const fetchOrders = token => {
   return dispatch => {
     dispatch(fetchOrdersStart());
     axios
-      .get('/orders')
+      .get('/orders?auth=' + token)
       .then(res => {
         const fetchedOrders = [];
         for (let key in res.data) {

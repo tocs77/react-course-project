@@ -50,8 +50,8 @@ type Order struct {
 }
 
 type AuthResponse struct {
-	LocalID string `json:"localId"`
-	IdToken string `json:"idToken"`
+	LocalID   string `json:"localId"`
+	IdToken   string `json:"idToken"`
 	ExpiresIn string `json:"expiresIn"`
 }
 
@@ -114,6 +114,7 @@ func handlerIngredients(w http.ResponseWriter, r *http.Request) {
 
 func handlerOrder(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	time.Sleep(time.Second * 2)
 	//vars := mux.Vars(r)
 	if r.Method == "OPTIONS" {
@@ -125,6 +126,13 @@ func handlerOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "GET" {
+		params := r.URL.Query()
+		authToken := params["auth"][0]
+		_, found := Tokens[authToken]
+		if !found {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
 		js, err := json.Marshal(Orders)
 		//err := json.NewEncoder(w).Encode(Orders)
 		if err != nil {
@@ -133,7 +141,7 @@ func handlerOrder(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+
 		w.WriteHeader(http.StatusOK)
 		w.Write(js)
 
@@ -157,8 +165,6 @@ func handlerOrder(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(data)
 		Orders[generateID()] = data
 	}
-
-	fmt.Println("Here")
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusCreated)
@@ -246,7 +252,7 @@ func handlerSignin(w http.ResponseWriter, r *http.Request) {
 		if Users[key].Email == data.Email {
 			if Users[key].Password == data.Password {
 				token := generateID() + generateID()
-				Tokens[key] = token
+				Tokens[token] = key
 				ar := AuthResponse{key, token, "3600"}
 
 				js, err := json.Marshal(ar)
