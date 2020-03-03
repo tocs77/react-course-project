@@ -12,7 +12,7 @@ import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 
 import * as actions from '../../../store/actions/index';
 
-import { updateObject } from '../../../shared/utility';
+import { updateObject, checkValidity } from '../../../shared/utility';
 
 class ContactData extends Component {
   state = {
@@ -100,23 +100,6 @@ class ContactData extends Component {
     formIsValid: false
   };
 
-  checkValidity(value, rules) {
-    let isValid = true;
-
-    if (rules.required) {
-      isValid = isValid && value.trim() !== '';
-    }
-
-    if (rules.minLength) {
-      isValid = isValid && value.trim().length >= rules.minLength;
-    }
-
-    if (rules.maxLength) {
-      isValid = isValid && value.trim().length <= rules.minLength;
-    }
-
-    return isValid;
-  }
 
   orderHandler = event => {
     event.preventDefault(); // Prevent form reloading
@@ -141,7 +124,7 @@ class ContactData extends Component {
   inputChangedHandler = (event, inputIdentifier) => {
     const updatedFormElement = updateObject(this.state.orderForm[inputIdentifier], {
       value: event.target.value,
-      valid: this.checkValidity(
+      valid: checkValidity(
         event.target.value,
         this.state.orderForm[inputIdentifier].validation
       ),
