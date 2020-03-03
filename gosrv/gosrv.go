@@ -47,11 +47,13 @@ type Order struct {
 	Price          float64     `json:"price"`
 	Customer       Customer    `json:"customer"`
 	DeliveryMethod string      `json:"deliveryMethod"`
+	UserID         string      `json:"userId"`
 }
 
+// AuthResponse struct
 type AuthResponse struct {
 	LocalID   string `json:"localId"`
-	IdToken   string `json:"idToken"`
+	IDToken   string `json:"idToken"`
 	ExpiresIn string `json:"expiresIn"`
 }
 
@@ -203,6 +205,8 @@ func handlerFullPost(w http.ResponseWriter, r *http.Request) {
 func handlerSignup(w http.ResponseWriter, r *http.Request) {
 	id := generateID()
 
+	log.Println("log up handler")
+
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -234,6 +238,7 @@ func handlerSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerSignin(w http.ResponseWriter, r *http.Request) {
+	log.Println("Login hadler")
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
