@@ -251,9 +251,11 @@ func handlerSignin(w http.ResponseWriter, r *http.Request) {
 
 	for key := range r.Form {
 		json.Unmarshal([]byte(key), &data)
-		//fmt.Println(data)
+		fmt.Println(data)
 	}
+	
 	for key := range Users {
+		log.Println("Try user: ", key)
 		if Users[key].Email == data.Email {
 			if Users[key].Password == data.Password {
 				token := generateID() + generateID()
